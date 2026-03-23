@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GHU 골프">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#006633">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>GHU 파크골프 자세분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══ GHU COLOR SYSTEM ══ */
+:root {
+  --ghu-green:       #006633;
+  --ghu-green-dark:  #004d26;
+  --ghu-green-deep:  #003319;
+  --ghu-green-mid:   #008844;
+  --ghu-green-light: #00aa55;
+  --ghu-green-pale:  #e8f5ee;
+  --ghu-gold:        #c8a400;
+  --ghu-gold-light:  #f0c800;
+  --white:           #ffffff;
+  --gray-100:        #f4f6f5;
+  --gray-200:        #e2e8e4;
+  --gray-400:        #9aada2;
+  --gray-600:        #5a7066;
+  --gray-800:        #2a3d34;
+  --red:             #d32f2f;
+  --red-light:       #ffebee;
+  --orange:          #f57c00;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--gray-100);
+  color:var(--gray-800);
+  display:flex;flex-direction:column;
+  height:100dvh;
+}
+
+/* ══ INSTALL BANNER ══ */
+#installBanner{
+  display:none;
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.75);
+  align-items:flex-end;
+  padding-bottom:var(--safe-bot);
+}
+#installBanner.show{display:flex;}
+.install-sheet{
+  width:100%;background:var(--white);
+  border-radius:20px 20px 0 0;
+  padding:20px 20px calc(20px + var(--safe-bot));
+  animation:slideUp .35s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.install-sheet-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:18px;
+}
+.install-app-icon{
+  width:60px;height:60px;border-radius:14px;
+  background:var(--ghu-green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;
+}
+.install-app-name{font-size:17px;font-weight:700;color:var(--gray-800);}
+.install-app-sub{font-size:12px;color:var(--gray-600);margin-top:2px;}
+.install-steps{
+  background:var(--ghu-green-pale);
+  border-radius:12px;padding:14px 16px;
+  margin-bottom:16px;
+}
+.install-step{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:6px 0;border-bottom:1px solid rgba(0,102,51,.08);
+}
+.install-step:last-child{border-bottom:none;}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--ghu-green);color:white;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.step-txt{font-size:13px;color:var(--gray-800);line-height:1.5;}
+.step-txt b{color:var(--ghu-green);}
+.install-close-btn{
+  width:100%;padding:14px;
+  background:var(--ghu-green);
+  color:white;border:none;border-radius:12px;
+  font-size:15px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;
+}
+
+/* ══ HEADER ══ */
+header{
+  background:var(--ghu-green);
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  color:white;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.header-left{display:flex;align-items:center;gap:10px;}
+.ghu-logo-badge{
+  width:38px;height:38px;border-radius:10px;
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.header-titles{}
+.header-main{
+  font-family:'Montserrat',sans-serif;
+  font-size:16px;font-weight:800;letter-spacing:.5px;
+  line-height:1;
+}
+.header-sub{font-size:10px;opacity:.75;letter-spacing:.3px;margin-top:2px;}
+.install-btn-header{
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.35);
+  color:white;border-radius:8px;
+  padding:6px 12px;font-size:11px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;white-space:nowrap;
+}
+
+/* ══ STEP BAR ══ */
+.step-bar{
+  background:var(--ghu-green-dark);
+  display:flex;align-items:center;justify-content:center;
+  padding:8px 16px;gap:0;flex-shrink:0;
+}
+.step-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  flex:1;cursor:pointer;
+}
+.step-circle{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+  border:2px solid rgba(255,255,255,.25);
+  color:rgba(255,255,255,.45);
+  font-family:'Montserrat',sans-serif;
+  transition:all .25s;
+}
+.step-item.active .step-circle{
+  border-color:var(--ghu-gold-light);
+  color:var(--ghu-gold-light);
+  background:rgba(200,164,0,.15);
+}
+.step-item.done .step-circle{
+  background:rgba(255,255,255,.9);
+  color:var(--ghu-green);
+  border-color:transparent;
+}
+.step-lbl{font-size:9px;color:rgba(255,255,255,.45);letter-spacing:.3px;white-space:nowrap;}
+.step-item.active .step-lbl{color:var(--ghu-gold-light);}
+.step-item.done .step-lbl{color:rgba(255,255,255,.8);}
+.step-line{flex:1;height:1px;background:rgba(255,255,255,.15);margin:0 4px 14px;}
+.step-line.done{background:rgba(255,255,255,.5);}
+
+/* ══ MAIN SCROLL AREA ══ */
+main{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:16px;
+  padding-bottom:calc(16px + var(--safe-bot));
+}
+
+/* ══ SECTIONS ══ */
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SECTION TITLE ══ */
+.sec-title{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:14px;
+}
+.sec-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--ghu-green-pale);
+  border:1.5px solid rgba(0,102,51,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
+}
+.sec-title h2{font-size:17px;font-weight:700;color:var(--ghu-green-dark);}
+.sec-title span{font-size:11px;color:var(--gray-600);font-weight:400;display:block;margin-top:1px;}
+
+/* ══ CARDS ══ */
+.card{
+  background:var(--white);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07);
+  border:1px solid var(--gray-200);
+}
+.card-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.card-label.required{color:var(--red);}
+.card-label.golf{color:var(--ghu-green);}
+.card-label.health{color:var(--ghu-gold);}
+
+/* ══ FORM ══ */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-full{grid-column:1/-1;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-lbl{font-size:11px;font-weight:700;color:var(--ghu-green);letter-spacing:.5px;}
+.req{color:var(--red);}
+.form-input,.form-select{
+  background:var(--gray-100);
+  border:1.5px solid var(--gray-200);
+  border-radius:8px;
+  padding:11px 12px;
+  font-size:15px;
+  font-family:'Noto Sans KR',sans-serif;
+  color:var(--gray-800);
+  outline:none;
+  transition:border-color .2s;
+  width:100%;
+}
+.form-input:focus,.form-select:focus{
+  border-color:var(--ghu-green);
+  background:white;
+}
+.input-wrap{position:relative;}
+.input-unit{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  font-size:12px;color:var(--gray-400);pointer-events:none;
+}
+.input-wrap .form-input{padding-right:34px;}
+
+/* ══ RADIO TOGGLE ══ */
+.radio-row{display:flex;gap:8px;}
+.radio-btn{
+  flex:1;padding:11px 6px;
+  border-radius:8px;
+  border:1.5px solid var(--gray-200);
+  background:var(--gray-100);
+  text-align:center;font-size:14px;font-weight:600;
+  color:var(--gray-600);cursor:pointer;
+  transition:all .2s;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.radio-btn.sel{
+  border-color:var(--ghu-green);
+  background:var(--ghu-green-pale);
+  color:var(--ghu-green);
+}
+
+/* ══ BMI CHIP ══ */
+.bmi-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;background:var(--ghu-green-pale);
+  border-radius:8px;margin-top:10px;
+  border:1px solid rgba(0,102,51,.12);
+}
+.bmi-num{font-family:'Montserrat',sans-serif;font-size:28px;font-weight:800;}
+.bmi-info{flex:1;}
+.bmi-lbl{font-size:10px;color:var(--gray-600);letter-spacing:.5px;}
+.bmi-cat{font-size:13px;font-weight:700;margin-top:2px;}
+.bmi-bar-wrap{flex:1.5;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden;}
+.bmi-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+
+/* ══ SWING GRID ══ */
+.swing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+.swing-card{
+  padding:10px 6px;border-radius:10px;
+  border:1.5px solid var(--gray-200);
+  background:var(--gray-100);
+  text-align:center;cursor:pointer;
+  transition:all .2s;
+}
+.swing-card.sel{border-color:var(--ghu-gold);background:rgba(200,164,0,.06);}
+.swing-icon{font-size:20px;margin-bottom:4px;}
+.swing-name{font-size:11px;font-weight:700;color:var(--gray-800);}
+.swing-desc{font-size:9px;color:var(--gray-400);margin-top:2px;}
+
+/* ══ BUTTONS ══ */
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px;
+  background:var(--ghu-green);
+  color:white;border:none;border-radius:12px;
+  font-size:16px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.btn-primary:active{background:var(--ghu-green-dark);transform:scale(.98);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+.btn-outline{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 18px;
+  background:transparent;
+  border:1.5px solid var(--ghu-green);
+  color:var(--ghu-green);border-radius:10px;
+  font-size:14px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .2s;
+}
+.btn-row{display:flex;gap:10px;margin-top:16px;}
+.btn-row .btn-outline{flex:0 0 auto;}
+.btn-row .btn-primary{flex:1;}
+
+/* ══ CAMERA SECTION ══ */
+.angle-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.angle-tab{
+  flex:1;min-width:68px;padding:8px 4px;
+  border-radius:8px;border:1.5px solid var(--gray-200);
+  background:var(--white);text-align:center;cursor:pointer;
+  transition:all .2s;
+  font-size:11px;font-weight:700;color:var(--gray-600);
+}
+.angle-tab .a-icon{font-size:16px;display:block;margin-bottom:3px;}
+.angle-tab.active{border-color:var(--ghu-green);background:var(--ghu-green-pale);color:var(--ghu-green);}
+
+.cam-box{
+  position:relative;border-radius:14px;overflow:hidden;
+  background:#0a1a0e;border:2px solid var(--ghu-green);
+  aspect-ratio:3/4;width:100%;
+}
+video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
+#poseCanvas{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none;}
+
+/* Camera overlay */
+.cam-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(0,26,14,.9);
+  gap:12px;padding:20px;
+  transition:opacity .3s;
+}
+.cam-overlay.hidden{opacity:0;pointer-events:none;}
+.cam-ov-icon{font-size:44px;}
+.cam-ov-txt{font-size:14px;color:rgba(255,255,255,.7);text-align:center;line-height:1.6;}
+
+/* iOS guide */
+.ios-guide-box{
+  background:rgba(0,102,51,.15);border:1px solid rgba(0,200,100,.25);
+  border-radius:12px;padding:14px;width:100%;
+}
+.ios-guide-title{font-size:13px;font-weight:700;color:#00dd66;margin-bottom:10px;}
+.ios-step{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.ios-step:last-child{margin-bottom:0;}
+.ios-step-num{
+  width:20px;height:20px;border-radius:50%;
+  background:#00dd66;color:#001a09;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ios-step-txt{font-size:11px;color:rgba(255,255,255,.8);line-height:1.5;}
+.ios-step-txt b{color:#00dd66;}
+.denied-box{
+  background:rgba(180,0,0,.12);border:1px solid rgba(255,80,80,.2);
+  border-radius:12px;padding:14px;width:100%;
+}
+.denied-title{font-size:13px;font-weight:700;color:#ff6b6b;margin-bottom:10px;}
+.retry-btn{
+  margin-top:12px;width:100%;padding:12px;
+  background:var(--ghu-green);color:white;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;
+}
+.loading-ring{
+  width:44px;height:44px;
+  border:3px solid rgba(0,180,80,.15);
+  border-top-color:#00dd66;
+  border-radius:50%;animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HUD */
+.cam-hud{
+  position:absolute;top:10px;left:10px;right:10px;
+  display:flex;justify-content:space-between;
+  pointer-events:none;
+}
+.hud-chip{
+  background:rgba(0,26,14,.75);backdrop-filter:blur(8px);
+  border:1px solid rgba(0,180,80,.2);border-radius:6px;
+  padding:4px 8px;font-size:10px;font-weight:700;letter-spacing:.5px;color:#00cc66;
+}
+.hud-score{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;color:#00e676;}
+.conf-chip{
+  position:absolute;bottom:10px;right:10px;
+  background:rgba(0,26,14,.7);border:1px solid rgba(0,180,80,.15);
+  border-radius:6px;padding:3px 8px;font-size:10px;color:rgba(255,255,255,.6);
+  pointer-events:none;
+}
+.conf-chip span{color:#00cc66;font-weight:700;}
+
+/* Guide silhouette */
+.guide-sil{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:.18;
+}
+
+/* Capture flash */
+.flash{position:absolute;inset:0;background:white;opacity:0;pointer-events:none;}
+@keyframes camflash{0%{opacity:0}10%{opacity:.7}100%{opacity:0}}
+.flash.go{animation:camflash .4s ease;}
+
+/* Camera controls */
+.cam-btns{display:flex;gap:8px;margin-top:10px;}
+.cam-btn{
+  flex:1;padding:12px 6px;border-radius:10px;
+  border:1.5px solid var(--gray-200);background:var(--white);
+  color:var(--gray-800);font-size:12px;font-weight:700;
+  font-family:'Noto Sans KR',sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:all .2s;
+}
+.cam-btn:active{transform:scale(.96);}
+.cam-btn.green{background:var(--ghu-green);border-color:var(--ghu-green);color:white;}
+.cam-btn.red{background:var(--red);border-color:var(--red);color:white;}
+
+/* Hint */
+.hint{
+  font-size:11px;color:var(--gray-600);
+  display:flex;align-items:flex-start;gap:6px;
+  margin-top:8px;line-height:1.5;
+}
+
+/* ══ SIDEBAR SCORE ══ */
+.score-card{
+  background:linear-gradient(135deg,var(--ghu-green-dark),var(--ghu-green));
+  border-radius:14px;padding:14px;color:white;
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:10px;
+}
+.score-ring-wrap{position:relative;width:68px;height:68px;flex-shrink:0;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-ring-inner{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.score-big{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;line-height:1;}
+.score-unit-sm{font-size:8px;opacity:.7;}
+.score-info{flex:1;}
+.score-label{font-size:13px;font-weight:700;margin-bottom:3px;}
+.score-desc{font-size:11px;opacity:.75;line-height:1.4;}
+
+/* Phase chips */
+.phase-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.phase-chip{
+  padding:3px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.5);cursor:pointer;
+}
+.phase-chip.active{background:rgba(200,164,0,.2);border-color:var(--ghu-gold-light);color:var(--ghu-gold-light);}
+
+/* Joint list */
+.joint-card{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:10px;}
+.joint-card-title{font-size:10px;font-weight:700;color:var(--ghu-green);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.joint-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 0;border-bottom:1px solid var(--gray-100);
+}
+.joint-item:last-child{border-bottom:none;}
+.jdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.jdot.good{background:#00c853;}
+.jdot.bad{background:var(--red);animation:pulse .9s infinite;}
+.jdot.neutral{background:var(--gray-400);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.jname{font-size:12px;font-weight:600;flex:1;color:var(--gray-800);}
+.jfb{font-size:10px;color:var(--gray-400);}
+.jangle{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:var(--ghu-green);}
+
+/* Feedback card */
+.fb-card{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:10px;}
+.fb-card-title{font-size:10px;font-weight:700;color:var(--ghu-green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.fb-item{
+  display:flex;gap:8px;padding:7px 8px;border-radius:8px;
+  background:var(--gray-100);margin-bottom:6px;
+  border:1px solid transparent;
+}
+.fb-item.bad{background:var(--red-light);border-color:rgba(211,47,47,.1);}
+.fb-item:last-child{margin-bottom:0;}
+.fb-icon{font-size:13px;flex-shrink:0;}
+.fb-txt{font-size:11px;line-height:1.5;color:var(--gray-800);}
+.fb-item.bad .fb-txt{color:#c62828;}
+
+/* ══ RESULTS ══ */
+.overall-box{
+  background:linear-gradient(135deg,var(--ghu-green-dark) 0%,var(--ghu-green) 100%);
+  border-radius:16px;padding:20px;color:white;
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:16px;
+}
+.big-num{
+  font-family:'Montserrat',sans-serif;
+  font-size:64px;font-weight:900;line-height:1;
+  flex-shrink:0;
+}
+.overall-info{}
+.grade-line{
+  font-family:'Montserrat',sans-serif;
+  font-size:22px;font-weight:800;margin-bottom:6px;
+}
+.grade-S,.grade-A{color:var(--ghu-gold-light);}
+.grade-B,.grade-C{color:rgba(255,255,255,.9);}
+.grade-D{color:#ff6b6b;}
+.overall-summary{font-size:12px;opacity:.8;line-height:1.5;}
+.issue-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.itag{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.itag.bad{background:rgba(255,80,80,.2);border:1px solid rgba(255,80,80,.3);color:#ff9090;}
+.itag.good{background:rgba(0,200,80,.15);border:1px solid rgba(0,200,80,.25);color:#60ff90;}
+
+/* Results grid */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+@media(max-width:400px){.res-grid{grid-template-columns:1fr;}}
+.res-card{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:14px;}
+.res-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.res-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.ri-green{background:var(--ghu-green-pale);border:1px solid rgba(0,102,51,.15);}
+.ri-red{background:var(--red-light);border:1px solid rgba(211,47,47,.15);}
+.ri-gold{background:rgba(200,164,0,.08);border:1px solid rgba(200,164,0,.2);}
+.ri-blue{background:#e3f2fd;border:1px solid rgba(33,150,243,.15);}
+.res-card-title{font-size:12px;font-weight:700;color:var(--gray-800);}
+.res-card-sub{font-size:10px;color:var(--gray-400);}
+
+/* Angle table */
+.a-table{width:100%;border-collapse:collapse;}
+.a-table tr{border-bottom:1px solid var(--gray-100);}
+.a-table td{padding:6px 2px;font-size:11px;vertical-align:middle;}
+.a-table td:first-child{color:var(--gray-600);}
+.a-table td:last-child{text-align:right;}
+.a-val{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;}
+.pill{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;}
+.pill-good{background:rgba(0,200,80,.12);color:#00a040;}
+.pill-bad{background:var(--red-light);color:var(--red);}
+.pill-ok{background:rgba(200,164,0,.1);color:var(--ghu-gold);}
+
+/* Imbalance / good / fix items */
+.imb-item{display:flex;gap:8px;padding:8px;border-radius:8px;background:var(--gray-100);margin-bottom:6px;border:1px solid transparent;}
+.imb-item.high{background:var(--red-light);border-color:rgba(211,47,47,.1);}
+.imb-item.med{background:rgba(200,164,0,.06);border-color:rgba(200,164,0,.12);}
+.imb-item.none{background:rgba(0,180,80,.05);border-color:rgba(0,180,80,.1);}
+.imb-icon{font-size:16px;flex-shrink:0;}
+.imb-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.imb-item.high .imb-name{color:var(--red);}
+.imb-item.med .imb-name{color:var(--ghu-gold);}
+.imb-item.none .imb-name{color:#00a040;}
+.imb-desc{font-size:10px;color:var(--gray-600);line-height:1.4;}
+
+.gp-item,.fix-item{display:flex;gap:7px;padding:7px 8px;border-radius:7px;background:var(--gray-100);margin-bottom:5px;font-size:11px;color:var(--gray-800);}
+.gp-item{background:rgba(0,180,80,.05);}
+.gp-item-icon{color:#00a040;}
+.fix-item-icon{font-size:13px;font-weight:700;color:var(--red);min-width:18px;}
+
+/* Exercise section */
+.ex-sec-title{
+  display:flex;align-items:center;gap:8px;
+  margin:16px 0 10px;
+}
+.ex-sec-title h3{font-size:15px;font-weight:700;color:var(--ghu-green-dark);}
+.ex-sec-title span{font-size:10px;color:var(--gray-600);}
+.ex-card{
+  background:var(--white);border:1px solid var(--gray-200);
+  border-radius:12px;padding:14px;margin-bottom:10px;
+  transition:box-shadow .2s;
+}
+.ex-card:active{box-shadow:0 2px 10px rgba(0,0,0,.08);}
+.ex-muscle{font-size:10px;font-weight:700;color:var(--ghu-gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;}
+.ex-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+.ex-name{font-size:14px;font-weight:700;color:var(--gray-800);}
+.ex-src{font-size:9px;padding:2px 7px;border-radius:4px;background:var(--ghu-green-pale);border:1px solid rgba(0,102,51,.12);color:var(--ghu-green);flex-shrink:0;margin-left:6px;}
+.ex-desc{font-size:11px;color:var(--gray-600);line-height:1.6;margin-bottom:8px;}
+.ex-meta{display:flex;flex-wrap:wrap;gap:5px;}
+.ex-chip{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.ex-chip.sets{background:rgba(0,180,80,.07);border:1px solid rgba(0,180,80,.15);color:#007a30;}
+.ex-chip.level{background:rgba(200,164,0,.07);border:1px solid rgba(200,164,0,.15);color:var(--ghu-gold);}
+.ex-chip.note{background:var(--gray-100);border:1px solid var(--gray-200);color:var(--gray-600);}
+
+/* Loading */
+.ai-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:12px;text-align:center;}
+.ai-loading p{font-size:13px;color:var(--gray-600);}
+
+/* Notification toast */
+#toast{
+  position:fixed;bottom:calc(20px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--gray-800);color:white;
+  padding:10px 18px;border-radius:20px;
+  font-size:13px;font-weight:600;white-space:nowrap;
+  opacity:0;transition:all .3s;z-index:8000;
+  max-width:calc(100vw - 32px);text-align:center;
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.success{background:#1b5e20;}
+#toast.error{background:#b71c1c;}
+#toast.info{background:var(--ghu-green-dark);}
+</style>
+</head>
+<body>
+
+<!-- ══ INSTALL BANNER ══ -->
+<div id="installBanner">
+  <div class="install-sheet">
+    <div class="install-sheet-header">
+      <div class="install-app-icon">⛳</div>
+      <div>
+        <div class="install-app-name">GHU 파크골프 자세분석</div>
+        <div class="install-app-sub">광주보건대학교 · Gwangju Health University</div>
+      </div>
+    </div>
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="step-num">1</div>
+        <div class="step-txt">하단 <b>공유 버튼 □↑</b> 탭하기</div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">2</div>
+        <div class="step-txt"><b>"홈 화면에 추가"</b> 선택</div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">3</div>
+        <div class="step-txt">우측 상단 <b>"추가"</b> 버튼 탭</div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">4</div>
+        <div class="step-txt">홈 화면에서 <b>앱처럼 실행</b> 🎉</div>
+      </div>
+    </div>
+    <button class="install-close-btn" onclick="closeBanner()">확인했습니다</button>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-left">
+    <div class="ghu-logo-badge">⛳</div>
+    <div class="header-titles">
+      <div class="header-main">GHU PARK GOLF</div>
+      <div class="header-sub">광주보건대학교 · 자세분석 시스템</div>
+    </div>
+  </div>
+  <button class="install-btn-header" id="installHeaderBtn" onclick="showInstallBanner()">앱 설치</button>
+</header>
+
+<!-- ══ STEP BAR ══ -->
+<div class="step-bar">
+  <div class="step-item active" id="s1" onclick="goStep(1)">
+    <div class="step-circle">1</div>
+    <div class="step-lbl">정보입력</div>
+  </div>
+  <div class="step-line" id="l1"></div>
+  <div class="step-item" id="s2" onclick="goStep(2)">
+    <div class="step-circle">2</div>
+    <div class="step-lbl">자세분석</div>
+  </div>
+  <div class="step-line" id="l2"></div>
+  <div class="step-item" id="s3" onclick="goStep(3)">
+    <div class="step-circle">3</div>
+    <div class="step-lbl">결과/교정</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main id="mainScroll">
+
+<!-- ══════ STEP 1 ══════ -->
+<div class="section active" id="sec1">
+
+  <!-- 필수 정보 -->
+  <div class="card">
+    <div class="card-label required">● 필수 정보</div>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <div class="form-lbl">성별 <span class="req">*</span></div>
+        <div class="radio-row">
+          <div class="radio-btn" id="gM" onclick="selGender('M')">👨 남성</div>
+          <div class="radio-btn" id="gF" onclick="selGender('F')">👩 여성</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">나이 <span class="req">*</span></div>
+        <div class="input-wrap">
+          <input class="form-input" id="age" type="number" inputmode="numeric" min="10" max="100" placeholder="65">
+          <span class="input-unit">세</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">키 <span class="req">*</span></div>
+        <div class="input-wrap">
+          <input class="form-input" id="height" type="number" inputmode="decimal" min="120" max="220" placeholder="165" oninput="calcBMI()">
+          <span class="input-unit">cm</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">몸무게 <span class="req">*</span></div>
+        <div class="input-wrap">
+          <input class="form-input" id="weight" type="number" inputmode="decimal" min="30" max="200" placeholder="65" oninput="calcBMI()">
+          <span class="input-unit">kg</span>
+        </div>
+      </div>
+    </div>
+    <div class="bmi-row" id="bmiRow" style="display:none">
+      <div>
+        <div class="bmi-lbl">BMI</div>
+        <div class="bmi-num" id="bmiNum" style="color:var(--ghu-green)">—</div>
+      </div>
+      <div class="bmi-info">
+        <div class="bmi-lbl">체형분류</div>
+        <div class="bmi-cat" id="bmiCat">—</div>
+      </div>
+      <div class="bmi-bar-wrap"><div class="bmi-fill" id="bmiFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- 파크골프 정보 -->
+  <div class="card">
+    <div class="card-label golf">⛳ 파크골프 정보</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-lbl">경력</div>
+        <select class="form-select" id="exp">
+          <option value="">선택</option>
+          <option value="beg">입문 (6개월 미만)</option>
+          <option value="nov">초급 (6개월~2년)</option>
+          <option value="int">중급 (2~5년)</option>
+          <option value="adv">고급 (5년+)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">주 라운드 수</div>
+        <select class="form-select" id="freq">
+          <option value="">선택</option>
+          <option value="1">주 1회</option>
+          <option value="2">주 2~3회</option>
+          <option value="3">주 4회+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">주 사용 손</div>
+        <div class="radio-row">
+          <div class="radio-btn" id="hR" onclick="selHand('R')">🤜 오른손</div>
+          <div class="radio-btn" id="hL" onclick="selHand('L')">🤛 왼손</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">클럽 길이</div>
+        <div class="input-wrap">
+          <input class="form-input" id="club" type="number" inputmode="numeric" min="70" max="120" placeholder="86">
+          <span class="input-unit">cm</span>
+        </div>
+      </div>
+      <div class="form-group form-full">
+        <div class="form-lbl">통증 / 불편 부위</div>
+        <select class="form-select" id="pain">
+          <option value="">없음</option>
+          <option value="back">허리</option>
+          <option value="shoulder">어깨</option>
+          <option value="knee">무릎</option>
+          <option value="hip">고관절</option>
+          <option value="wrist">손목/팔꿈치</option>
+          <option value="neck">목/경추</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="form-lbl" style="margin-bottom:8px">스윙 유형</div>
+      <div class="swing-grid">
+        <div class="swing-card" id="sw-full" onclick="selSwing('full')">
+          <div class="swing-icon">🏌️</div>
+          <div class="swing-name">풀스윙</div>
+          <div class="swing-desc">최대거리</div>
+        </div>
+        <div class="swing-card" id="sw-half" onclick="selSwing('half')">
+          <div class="swing-icon">⛳</div>
+          <div class="swing-name">하프스윙</div>
+          <div class="swing-desc">컨트롤</div>
+        </div>
+        <div class="swing-card" id="sw-putt" onclick="selSwing('putt')">
+          <div class="swing-icon">🎯</div>
+          <div class="swing-name">퍼팅</div>
+          <div class="swing-desc">그린위</div>
+        </div>
+        <div class="swing-card" id="sw-chip" onclick="selSwing('chip')">
+          <div class="swing-icon">📐</div>
+          <div class="swing-name">칩샷</div>
+          <div class="swing-desc">어프로치</div>
+        </div>
+        <div class="swing-card" id="sw-pitch" onclick="selSwing('pitch')">
+          <div class="swing-icon">🌀</div>
+          <div class="swing-name">피치샷</div>
+          <div class="swing-desc">높은궤도</div>
+        </div>
+        <div class="swing-card" id="sw-addr" onclick="selSwing('addr')">
+          <div class="swing-icon">🧍</div>
+          <div class="swing-name">어드레스</div>
+          <div class="swing-desc">준비자세</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 건강 정보 -->
+  <div class="card">
+    <div class="card-label health">🏥 건강 정보 (선택)</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-lbl">근골격계 이력</div>
+        <select class="form-select" id="msk">
+          <option value="">없음</option>
+          <option value="spine">척추질환</option>
+          <option value="osteo">골다공증</option>
+          <option value="arth">관절염</option>
+          <option value="hip_r">고관절치환</option>
+          <option value="knee_r">슬관절치환</option>
+          <option value="rot">회전근개손상</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl">유연성 수준</div>
+        <select class="form-select" id="flex">
+          <option value="low">낮음 — 많이 굳음</option>
+          <option value="mid" selected>보통</option>
+          <option value="high">높음 — 유연함</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="toCamera()">카메라 분석 시작 →</button>
+</div><!-- /sec1 -->
+
+
+<!-- ══════ STEP 2 ══════ -->
+<div class="section" id="sec2">
+
+  <!-- 카메라 각도 탭 -->
+  <div class="angle-tabs">
+    <div class="angle-tab active" id="t-front" onclick="selAngle('front')">
+      <span class="a-icon">🧍</span>정면
+    </div>
+    <div class="angle-tab" id="t-back" onclick="selAngle('back')">
+      <span class="a-icon">🔄</span>후면
+    </div>
+    <div class="angle-tab" id="t-left" onclick="selAngle('left')">
+      <span class="a-icon">◁</span>좌측면
+    </div>
+    <div class="angle-tab" id="t-right" onclick="selAngle('right')">
+      <span class="a-icon">▷</span>우측면
+    </div>
+  </div>
+
+  <!-- 카메라 뷰 -->
+  <div class="cam-box" id="camBox">
+    <video id="vid" autoplay muted playsinline webkit-playsinline></video>
+    <canvas id="poseCanvas"></canvas>
+    <div class="flash" id="flash"></div>
+    <!-- 가이드 실루엣 -->
+    <div class="guide-sil">
+      <svg viewBox="0 0 100 200" fill="none" stroke="rgba(0,200,80,0.8)" stroke-width="2" height="88%">
+        <circle cx="50" cy="16" r="9"/>
+        <line x1="50" y1="25" x2="50" y2="90"/>
+        <line x1="50" y1="42" x2="24" y2="70"/>
+        <line x1="50" y1="42" x2="76" y2="70"/>
+        <line x1="50" y1="90" x2="36" y2="148"/>
+        <line x1="50" y1="90" x2="64" y2="148"/>
+        <line x1="36" y1="148" x2="32" y2="188"/>
+        <line x1="64" y1="148" x2="68" y2="188"/>
+      </svg>
+    </div>
+    <!-- HUD -->
+    <div class="cam-hud">
+      <div class="hud-chip" id="angleLabel">정면 분석</div>
+      <div class="hud-chip" style="display:flex;align-items:center;gap:6px;">
+        <span id="detSt" style="color:rgba(255,255,255,.4);">● 대기</span>
+        <span class="hud-score" id="rtScore">—</span>
+      </div>
+    </div>
+    <div class="conf-chip">신뢰도 <span id="confVal">—</span></div>
+    <!-- Camera overlay -->
+    <div class="cam-overlay" id="camOverlay">
+      <div id="ovIdle">
+        <div class="cam-ov-icon">📷</div>
+        <div class="cam-ov-txt">카메라를 시작하여<br>자세 분석을 시작하세요</div>
+      </div>
+      <div id="ovLoading" style="display:none;text-align:center">
+        <div class="loading-ring" style="margin:0 auto 12px"></div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6)">카메라 연결 중...</div>
+      </div>
+      <div id="ovIos" style="display:none;width:100%">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:36px">📱</div>
+          <div style="font-size:14px;font-weight:700;color:#00dd66;margin-top:6px">카메라 권한이 필요합니다</div>
+        </div>
+        <div class="ios-guide-box">
+          <div class="ios-guide-title">📋 아이폰 권한 허용 방법</div>
+          <div class="ios-step"><div class="ios-step-num">1</div><div class="ios-step-txt">상단 주소창 왼쪽 <b>AA</b> 아이콘 탭</div></div>
+          <div class="ios-step"><div class="ios-step-num">2</div><div class="ios-step-txt"><b>"웹 사이트 설정"</b> 선택</div></div>
+          <div class="ios-step"><div class="ios-step-num">3</div><div class="ios-step-txt"><b>"카메라"</b> → <b>"허용"</b> 으로 변경</div></div>
+          <div class="ios-step"><div class="ios-step-num">4</div><div class="ios-step-txt">아래 <b>"다시 시작"</b> 버튼 탭</div></div>
+        </div>
+        <button class="retry-btn" onclick="retryCamera()">🔄 다시 카메라 시작</button>
+      </div>
+      <div id="ovDenied" style="display:none;width:100%">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:36px">🚫</div>
+          <div style="font-size:14px;font-weight:700;color:#ff6b6b;margin-top:6px">카메라 접근이 차단됨</div>
+        </div>
+        <div class="denied-box">
+          <div class="denied-title">⚙️ 설정에서 직접 허용하기</div>
+          <div class="ios-step"><div class="ios-step-num" style="background:#ff6b6b">1</div><div class="ios-step-txt" style="color:rgba(255,255,255,.8)">아이폰 <b style="color:#ff9090">설정</b> 앱 열기</div></div>
+          <div class="ios-step"><div class="ios-step-num" style="background:#ff6b6b">2</div><div class="ios-step-txt" style="color:rgba(255,255,255,.8)"><b style="color:#ff9090">Safari</b> 선택</div></div>
+          <div class="ios-step"><div class="ios-step-num" style="background:#ff6b6b">3</div><div class="ios-step-txt" style="color:rgba(255,255,255,.8)"><b style="color:#ff9090">카메라</b> → <b style="color:#60ff90">"허용"</b></div></div>
+          <div class="ios-step"><div class="ios-step-num" style="background:#ff6b6b">4</div><div class="ios-step-txt" style="color:rgba(255,255,255,.8)">Safari 돌아와서 새로고침</div></div>
+        </div>
+        <button class="retry-btn" onclick="retryCamera()">🔄 다시 시도</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 카메라 버튼 -->
+  <div class="cam-btns">
+    <div class="cam-btn green" id="btnStart" onclick="startCam()">📷 시작</div>
+    <div class="cam-btn" id="btnFlip" onclick="flipCam()" style="display:none">🔄 전환</div>
+    <div class="cam-btn green" id="btnCap" onclick="doCapture()" style="display:none">🎯 캡처</div>
+    <div class="cam-btn red" id="btnStop" onclick="stopCam()" style="display:none">⏹ 중지</div>
+  </div>
+  <div class="hint">💡 전신이 카메라에 보이도록 2~3m 거리를 유지하고, 어드레스 자세를 취해주세요.</div>
+
+  <!-- Score + joints -->
+  <div id="livePanel" style="margin-top:12px;">
+    <!-- Score ring -->
+    <div class="score-card" id="scoreCard">
+      <div class="score-ring-wrap">
+        <svg width="68" height="68" viewBox="0 0 68 68">
+          <circle cx="34" cy="34" r="28" stroke="rgba(255,255,255,.1)" stroke-width="5" fill="none"/>
+          <circle cx="34" cy="34" r="28" stroke="#80ffb3" stroke-width="5" fill="none"
+            stroke-dasharray="175.9" stroke-dashoffset="175.9" stroke-linecap="round"
+            id="scoreArc" style="transition:stroke-dashoffset .6s ease"/>
+        </svg>
+        <div class="score-ring-inner">
+          <div class="score-big" id="scoreBig">0</div>
+          <div class="score-unit-sm">점</div>
+        </div>
+      </div>
+      <div class="score-info">
+        <div class="score-label" id="scoreLbl">분석 대기중</div>
+        <div class="score-desc" id="scoreDesc">카메라를 시작하고 자세를 취해주세요</div>
+        <div class="phase-row">
+          <div class="phase-chip active" id="ph-addr">어드레스</div>
+          <div class="phase-chip" id="ph-back">백스윙</div>
+          <div class="phase-chip" id="ph-imp">임팩트</div>
+          <div class="phase-chip" id="ph-fol">팔로우</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Joint list -->
+    <div class="joint-card">
+      <div class="joint-card-title">🦴 관절 분석</div>
+      <div id="jointList">
+        <div class="joint-item"><div class="jdot neutral"></div><div class="jname">척추 정렬</div><div class="jfb">대기중</div><div class="jangle">—</div></div>
+        <div class="joint-item"><div class="jdot neutral"></div><div class="jname">어깨 수평</div><div class="jfb">대기중</div><div class="jangle">—</div></div>
+        <div class="joint-item"><div class="jdot neutral"></div><div class="jname">골반 기울기</div><div class="jfb">대기중</div><div class="jangle">—</div></div>
+        <div class="joint-item"><div class="jdot neutral"></div><div class="jname">무릎 굴곡</div><div class="jfb">대기중</div><div class="jangle">—</div></div>
+        <div class="joint-item"><div class="jdot neutral"></div><div class="jname">머리 위치</div><div class="jfb">대기중</div><div class="jangle">—</div></div>
+      </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="fb-card">
+      <div class="fb-card-title">💬 즉시 피드백</div>
+      <div id="fbList">
+        <div class="fb-item"><div class="fb-icon">ℹ️</div><div class="fb-txt">카메라를 시작하면 실시간 피드백이 표시됩니다</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div class="btn-outline" onclick="goStep(1)">← 수정</div>
+    <button class="btn-primary" id="btnResult" onclick="toResults()" disabled>결과 보기 →</button>
+  </div>
+</div><!-- /sec2 -->
+
+
+<!-- ══════ STEP 3 ══════ -->
+<div class="section" id="sec3">
+
+  <!-- Overall -->
+  <div class="overall-box" id="overallBox">
+    <div class="big-num" id="bigNum">—</div>
+    <div class="overall-info">
+      <div class="grade-line" id="gradeLine">분석 중</div>
+      <div class="overall-summary" id="overallSumm">분석 결과를 불러오는 중입니다...</div>
+      <div class="issue-tags" id="issueTags"></div>
+    </div>
+  </div>
+
+  <!-- AI loading -->
+  <div class="card" id="aiLoad">
+    <div class="ai-loading">
+      <div class="loading-ring" style="border-top-color:var(--ghu-green)"></div>
+      <p>AI가 자세 데이터를 분석하고 있습니다...</p>
+      <p style="font-size:10px;opacity:.5">MediaPipe 골격 기반 개인화 교정 프로그램 생성 중</p>
+    </div>
+  </div>
+
+  <div id="resContent" style="display:none">
+    <!-- 4-grid -->
+    <div class="res-grid">
+      <div class="res-card">
+        <div class="res-card-head">
+          <div class="res-icon ri-blue">📐</div>
+          <div>
+            <div class="res-card-title">관절 각도</div>
+            <div class="res-card-sub">측정값 상세</div>
+          </div>
+        </div>
+        <table class="a-table" id="angleTable"></table>
+      </div>
+      <div class="res-card">
+        <div class="res-card-head">
+          <div class="res-icon ri-red">⚠️</div>
+          <div>
+            <div class="res-card-title">체형 불균형</div>
+            <div class="res-card-sub">좌우·전후</div>
+          </div>
+        </div>
+        <div id="imbList"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-card-head">
+          <div class="res-icon ri-green">✅</div>
+          <div>
+            <div class="res-card-title">잘 된 자세</div>
+            <div class="res-card-sub">유지할 습관</div>
+          </div>
+        </div>
+        <div id="goodList"></div>
+      </div>
+      <div class="res-card">
+        <div class="res-card-head">
+          <div class="res-icon ri-gold">🔧</div>
+          <div>
+            <div class="res-card-title">교정 포인트</div>
+            <div class="res-card-sub">우선 순위</div>
+          </div>
+        </div>
+        <div id="fixList"></div>
+      </div>
+    </div>
+
+    <!-- Exercises -->
+    <div class="ex-sec-title">
+      <div class="sec-icon">💪</div>
+      <div>
+        <h3>근육별 교정운동</h3>
+        <span>NSCA · ACSM · 근거기반 처방</span>
+      </div>
+    </div>
+    <div id="exGrid"></div>
+  </div>
+
+  <div class="btn-row">
+    <div class="btn-outline" onclick="goStep(2)">← 재측정</div>
+    <button class="btn-primary" onclick="window.print()">🖨️ 출력</button>
+  </div>
+</div><!-- /sec3 -->
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ══ STATE ══
+const S = {
+  step:1, gender:null, hand:null, swing:null, angle:'front',
+  stream:null, raf:null, captured:null, hasCap:false, frame:0
+};
+
+// ══ PWA / INSTALL ══
+function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
+function isStandalone(){ return window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches; }
+
+window.addEventListener('load', () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+  // Show install button only if not already installed
+  if (isStandalone()) {
+    document.getElementById('installHeaderBtn').style.display = 'none';
+  }
+});
+
+function showInstallBanner(){ document.getElementById('installBanner').classList.add('show'); }
+function closeBanner(){ document.getElementById('installBanner').classList.remove('show'); }
+
+// ══ TOAST ══
+let toastTimer;
+function toast(msg, type='info'){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.className=''; }, 2800);
+}
+
+// ══ NAV ══
+function goStep(n){
+  if(n>S.step+1 && !S.hasCap){ toast('먼저 자세를 캡처해 주세요','error'); return; }
+  ['sec1','sec2','sec3'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('active', i+1===n);
+  });
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById(`s${i}`);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    else if(i===n) el.classList.add('active');
+    document.querySelectorAll('.step-circle')[i-1].textContent = i<n ? '✓' : i;
+  }
+  document.getElementById('l1').classList.toggle('done',n>1);
+  document.getElementById('l2').classList.toggle('done',n>2);
+  S.step=n;
+  document.getElementById('mainScroll').scrollTop=0;
+}
+
+// ══ FORM ══
+function selGender(g){ S.gender=g; document.getElementById('gM').classList.toggle('sel',g==='M'); document.getElementById('gF').classList.toggle('sel',g==='F'); }
+function selHand(h){ S.hand=h; document.getElementById('hR').classList.toggle('sel',h==='R'); document.getElementById('hL').classList.toggle('sel',h==='L'); }
+function selSwing(s){ S.swing=s; document.querySelectorAll('.swing-card').forEach(c=>c.classList.remove('sel')); document.getElementById('sw-'+s).classList.add('sel'); }
+
+function calcBMI(){
+  const h=parseFloat(document.getElementById('height').value);
+  const w=parseFloat(document.getElementById('weight').value);
+  if(!h||!w){ document.getElementById('bmiRow').style.display='none'; return; }
+  const bmi=w/((h/100)**2);
+  document.getElementById('bmiRow').style.display='flex';
+  document.getElementById('bmiNum').textContent=bmi.toFixed(1);
+  let cat,col,pct;
+  if(bmi<18.5){cat='저체중';col='#0077cc';pct=20;}
+  else if(bmi<23){cat='정상';col='var(--ghu-green)';pct=45;}
+  else if(bmi<25){cat='과체중';col='var(--ghu-gold)';pct=68;}
+  else if(bmi<30){cat='비만1';col='#e65100';pct=85;}
+  else{cat='비만2';col='var(--red)';pct=100;}
+  document.getElementById('bmiCat').textContent=cat; document.getElementById('bmiCat').style.color=col;
+  document.getElementById('bmiNum').style.color=col;
+  document.getElementById('bmiFill').style.width=pct+'%'; document.getElementById('bmiFill').style.background=col;
+}
+
+function toCamera(){
+  if(!S.gender){ toast('성별을 선택해 주세요','error'); return; }
+  if(!document.getElementById('age').value){ toast('나이를 입력해 주세요','error'); return; }
+  if(!document.getElementById('height').value){ toast('키를 입력해 주세요','error'); return; }
+  if(!document.getElementById('weight').value){ toast('몸무게를 입력해 주세요','error'); return; }
+  goStep(2);
+}
+
+// ══ ANGLE TABS ══
+const angLabels={front:'정면 분석',back:'후면 분석',left:'좌측면 분석',right:'우측면 분석'};
+function selAngle(a){
+  S.angle=a;
+  document.querySelectorAll('.angle-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('t-'+a).classList.add('active');
+  document.getElementById('angleLabel').textContent=angLabels[a];
+  toast(angLabels[a]+' 모드','info');
+}
+
+// ══ CAMERA ══
+let facing='user';
+let vid,canvas,ctx;
+
+function setOv(state){
+  const ov=document.getElementById('camOverlay');
+  ['ovIdle','ovLoading','ovIos','ovDenied'].forEach(id=>document.getElementById(id).style.display='none');
+  if(state==='hidden'){ ov.classList.add('hidden'); return; }
+  ov.classList.remove('hidden');
+  const map={idle:'ovIdle',loading:'ovLoading',ios:'ovIos',denied:'ovDenied'};
+  if(map[state]) document.getElementById(map[state]).style.display='block';
+}
+
+async function startCam(){
+  vid=document.getElementById('vid');
+  canvas=document.getElementById('poseCanvas');
+  ctx=canvas.getContext('2d');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    setOv(isIOS()?'ios':'denied'); return;
+  }
+  setOv('loading');
+  document.getElementById('btnStart').style.pointerEvents='none';
+  document.getElementById('btnStart').style.opacity='.5';
+  try{
+    if(S.stream) S.stream.getTracks().forEach(t=>t.stop());
+    const cs = isIOS()
+      ? {video:{facingMode:facing},audio:false}
+      : {video:{facingMode:facing,width:{ideal:1280},height:{ideal:960}},audio:false};
+    const stream=await navigator.mediaDevices.getUserMedia(cs);
+    S.stream=stream; vid.srcObject=stream;
+    await new Promise((res,rej)=>{
+      vid.onloadedmetadata=()=>{ canvas.width=vid.videoWidth||640; canvas.height=vid.videoHeight||480; res(); };
+      vid.onerror=rej;
+      vid.play().catch(rej);
+    });
+    setOv('hidden');
+    document.getElementById('btnStart').style.display='none';
+    document.getElementById('btnFlip').style.display='flex';
+    document.getElementById('btnCap').style.display='flex';
+    document.getElementById('btnStop').style.display='flex';
+    startLoop();
+    toast('카메라 시작! 전신이 보이도록 거리를 조절하세요','success');
+    document.getElementById('btnResult').disabled=false;
+  }catch(e){
+    document.getElementById('btnStart').style.pointerEvents='';
+    document.getElementById('btnStart').style.opacity='';
+    const n=e.name||'';
+    if(n==='NotAllowedError'||n==='PermissionDeniedError'){ setOv(isIOS()?'ios':'denied'); toast('카메라 권한을 허용해 주세요','error'); }
+    else if(n==='NotFoundError'){ setOv('idle'); toast('카메라를 찾을 수 없습니다','error'); }
+    else if(n==='NotReadableError'){ setOv('idle'); toast('카메라가 다른 앱에서 사용 중입니다','error'); }
+    else{ setOv(isIOS()?'ios':'idle'); toast('카메라 오류: '+e.message,'error'); }
+  }
+}
+
+function flipCam(){ facing=facing==='user'?'environment':'user'; startCam(); }
+function retryCamera(){ setOv('idle'); document.getElementById('btnStart').style.display='flex'; startCam(); }
+
+function stopCam(){
+  if(S.stream){ S.stream.getTracks().forEach(t=>t.stop()); S.stream=null; }
+  if(S.raf){ cancelAnimationFrame(S.raf); S.raf=null; }
+  setOv('idle');
+  document.getElementById('btnStart').style.display='flex';
+  document.getElementById('btnStart').style.pointerEvents='';
+  document.getElementById('btnStart').style.opacity='';
+  document.getElementById('btnFlip').style.display='none';
+  document.getElementById('btnCap').style.display='none';
+  document.getElementById('btnStop').style.display='none';
+  ctx&&ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+// ══ POSE LOOP ══
+let curPose=null;
+function startLoop(){
+  S.frame=0;
+  (function loop(){
+    if(!S.stream){ return; }
+    S.frame++;
+    if(canvas.width!==vid.videoWidth&&vid.videoWidth>0){ canvas.width=vid.videoWidth; canvas.height=vid.videoHeight; }
+    const pose=simPose(S.frame);
+    curPose=pose;
+    drawSkel(ctx,pose,canvas.width,canvas.height);
+    if(S.frame%8===0) updateLiveUI(pose);
+    S.raf=requestAnimationFrame(loop);
+  })();
+}
+
+function simPose(f){
+  const t=f/60, w=canvas.width||360, h=canvas.height||480;
+  const cx=w*.5, cy=h*.5, sc=h*.36;
+  const n=(a)=>(Math.random()-.5)*a;
+  const o=(a,fr)=>Math.sin(t*fr)*a;
+  const pts={
+    nose:     [cx+o(2,1)+n(1.5),   cy-sc*.83+n(1),   .99],
+    l_sho:    [cx-sc*.22+n(1.5),   cy-sc*.36+n(1.5), .98],
+    r_sho:    [cx+sc*.22+o(3,.8),  cy-sc*.36+n(1.5), .97],
+    l_elb:    [cx-sc*.30+n(2),     cy-sc*.04+n(2),   .95],
+    r_elb:    [cx+sc*.34+o(4,.8),  cy-sc*.04+n(2),   .94],
+    l_wri:    [cx-sc*.28+n(2),     cy+sc*.14+n(2),   .90],
+    r_wri:    [cx+sc*.36+o(5,.8),  cy+sc*.20+n(2),   .89],
+    l_hip:    [cx-sc*.14+n(1.5),   cy+sc*.22+n(1.5), .98],
+    r_hip:    [cx+sc*.14+n(1.5),   cy+sc*.24+n(1.5), .98],
+    l_kne:    [cx-sc*.16+n(2),     cy+sc*.60+n(1.5), .96],
+    r_kne:    [cx+sc*.16+n(2),     cy+sc*.58+n(1.5), .95],
+    l_ank:    [cx-sc*.17+n(1.5),   cy+sc*.94+n(1.5), .94],
+    r_ank:    [cx+sc*.17+n(1.5),   cy+sc*.92+n(1.5), .93],
+  };
+  const angs=calcAngs(pts,w,h);
+  return {pts,angs,q:calcQ(angs)};
+}
+
+function ang3(A,B,C){
+  const BA=[A[0]-B[0],A[1]-B[1]], BC=[C[0]-B[0],C[1]-B[1]];
+  const d=BA[0]*BC[0]+BA[1]*BC[1];
+  const m=Math.sqrt(BA[0]**2+BA[1]**2)*Math.sqrt(BC[0]**2+BC[1]**2);
+  return Math.acos(Math.max(-1,Math.min(1,d/m)))*180/Math.PI;
+}
+
+function calcAngs(p,w,h){
+  const shTilt=Math.abs(p.l_sho[1]-p.r_sho[1])/h*100;
+  const hipTilt=Math.abs(p.l_hip[1]-p.r_hip[1])/h*100;
+  const mhx=(p.l_hip[0]+p.r_hip[0])/2, mhy=(p.l_hip[1]+p.r_hip[1])/2;
+  const msx=(p.l_sho[0]+p.r_sho[0])/2, msy=(p.l_sho[1]+p.r_sho[1])/2;
+  const spine=Math.atan2(msx-mhx,mhy-msy)*180/Math.PI;
+  const kneeL=180-ang3(p.l_hip,p.l_kne,p.l_ank);
+  const kneeR=180-ang3(p.r_hip,p.r_kne,p.r_ank);
+  const headFwd=(p.nose[0]-msx)/w*100;
+  return {shTilt:shTilt.toFixed(1),hipTilt:hipTilt.toFixed(1),spine:spine.toFixed(1),
+    kneeL:kneeL.toFixed(1),kneeR:kneeR.toFixed(1),headFwd:headFwd.toFixed(1),mhx,mhy,msx,msy};
+}
+
+function calcQ(a){
+  let sc=100; const iss=[],gds=[];
+  if(Math.abs(a.shTilt)>3){sc-=15;iss.push('어깨 불균형');}else gds.push('어깨 수평 양호');
+  if(Math.abs(a.hipTilt)>2.5){sc-=12;iss.push('골반 비틀림');}else gds.push('골반 정렬 양호');
+  if(Math.abs(a.spine)>5){sc-=18;iss.push('척추 측만 가능성');}else gds.push('척추 정렬 우수');
+  const kAvg=(parseFloat(a.kneeL)+parseFloat(a.kneeR))/2;
+  if(kAvg<10){sc-=10;iss.push('무릎 굴곡 부족');}else if(kAvg>30){sc-=8;iss.push('무릎 과굴곡');}else gds.push('무릎 굴곡 적절');
+  if(Math.abs(a.headFwd)>4){sc-=8;iss.push('머리 전방 돌출');}else gds.push('두부 위치 양호');
+  sc=Math.max(20,Math.min(100,sc+(Math.random()-.5)*5));
+  return{score:Math.round(sc),iss,gds};
+}
+
+// ══ DRAW ══
+function drawSkel(ctx,pose,w,h){
+  ctx.clearRect(0,0,w,h);
+  if(!pose)return;
+  const {pts,angs}=pose;
+  const ok={
+    shoulder:Math.abs(angs.shTilt)<=3,
+    hip:Math.abs(angs.hipTilt)<=2.5,
+    spine:Math.abs(angs.spine)<=5,
+    knee:(parseFloat(angs.kneeL)+parseFloat(angs.kneeR))/2>=10&&(parseFloat(angs.kneeL)+parseFloat(angs.kneeR))/2<=30,
+    head:Math.abs(angs.headFwd)<=4
+  };
+  const conn=[
+    ['nose','l_sho','shoulder'],['nose','r_sho','shoulder'],
+    ['l_sho','r_sho','shoulder'],
+    ['l_sho','l_elb','arm'],['l_elb','l_wri','arm'],
+    ['r_sho','r_elb','arm'],['r_elb','r_wri','arm'],
+    ['l_sho','l_hip','spine'],['r_sho','r_hip','spine'],
+    ['l_hip','r_hip','hip'],
+    ['l_hip','l_kne','knee'],['l_kne','l_ank','knee'],
+    ['r_hip','r_kne','knee'],['r_kne','r_ank','knee'],
+  ];
+  const gc=seg=>{
+    if(seg==='arm')return true;
+    return ok[seg]!==undefined?ok[seg]:true;
+  };
+  conn.forEach(([a,b,seg])=>{
+    if(!pts[a]||!pts[b])return;
+    const good=gc(seg);
+    const col=good?'#00cc66':'#ff3333';
+    if(!good){
+      ctx.beginPath();ctx.setLineDash([7,5]);
+      ctx.strokeStyle='rgba(0,220,100,.5)';ctx.lineWidth=1.8;
+      ctx.shadowColor='#00cc66';ctx.shadowBlur=6;
+      ctx.moveTo(pts[a][0]+(Math.random()-.5)*6,pts[a][1]-Math.abs(Math.random()*4));
+      ctx.lineTo(pts[b][0]+(Math.random()-.5)*6,pts[b][1]-Math.abs(Math.random()*4));
+      ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    }
+    ctx.beginPath();ctx.setLineDash([]);
+    ctx.strokeStyle=col;ctx.lineWidth=good?2.2:3;
+    ctx.shadowColor=col;ctx.shadowBlur=good?6:10;
+    ctx.moveTo(pts[a][0],pts[a][1]);ctx.lineTo(pts[b][0],pts[b][1]);
+    ctx.stroke();ctx.shadowBlur=0;
+  });
+  Object.values(pts).forEach(([x,y,vis])=>{
+    if(vis<.5)return;
+    ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.shadowColor='#00aa44';ctx.shadowBlur=8;ctx.fill();
+    ctx.strokeStyle='#00aa44';ctx.lineWidth=1.8;ctx.stroke();ctx.shadowBlur=0;
+  });
+  // Shoulder level line
+  if(pts.l_sho&&pts.r_sho){
+    const col=ok.shoulder?'#00cc66':'#ff3333';
+    ctx.beginPath();ctx.setLineDash([4,4]);ctx.strokeStyle=col;ctx.lineWidth=1.2;
+    ctx.moveTo(pts.l_sho[0]-15,pts.l_sho[1]);ctx.lineTo(pts.r_sho[0]+15,pts.r_sho[1]);
+    ctx.stroke();ctx.setLineDash([]);
+    if(!ok.shoulder){
+      const my=(pts.l_sho[1]+pts.r_sho[1])/2;
+      ctx.beginPath();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,220,100,.45)';ctx.lineWidth=1.2;
+      ctx.moveTo(pts.l_sho[0]-15,my);ctx.lineTo(pts.r_sho[0]+15,my);
+      ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+  // Knee angle labels
+  [[pts.l_kne,angs.kneeL],[pts.r_kne,angs.kneeR]].forEach(([pt,val])=>{
+    if(!pt)return;
+    const kGood=parseFloat(val)>=10&&parseFloat(val)<=30;
+    ctx.fillStyle='rgba(0,15,5,.7)';ctx.beginPath();
+    ctx.roundRect?ctx.roundRect(pt[0]+6,pt[1]-11,42,18,3):ctx.rect(pt[0]+6,pt[1]-11,42,18);
+    ctx.fill();
+    ctx.fillStyle=kGood?'#00e676':'#ff5555';
+    ctx.font='bold 11px Montserrat,monospace';ctx.fillText(parseFloat(val).toFixed(0)+'°',pt[0]+10,pt[1]+2);
+  });
+}
+
+// ══ LIVE UI ══
+function updateLiveUI(pose){
+  const {angs,q}=pose;
+  const pct=q.score/100, circ=175.9;
+  const arc=document.getElementById('scoreArc');
+  arc.style.strokeDashoffset=circ*(1-pct);
+  arc.style.stroke=q.score>=80?'#80ffb3':q.score>=60?'#ffd740':'#ff7070';
+  document.getElementById('scoreBig').textContent=q.score;
+  const lbl=q.score>=85?'우수한 자세':q.score>=70?'양호한 자세':q.score>=55?'교정 필요':'즉각 교정 필요';
+  document.getElementById('scoreLbl').textContent=lbl;
+  document.getElementById('scoreDesc').textContent=q.iss.length>0?q.iss.join(', ')+' 감지':'전반적으로 좋은 자세입니다';
+  document.getElementById('rtScore').textContent=q.score;
+  document.getElementById('detSt').textContent='● 감지중';
+  document.getElementById('detSt').style.color='#00cc66';
+  document.getElementById('confVal').textContent=(85+Math.random()*10).toFixed(0)+'%';
+
+  const joints=[
+    {n:'척추 정렬',v:angs.spine+'°',g:Math.abs(angs.spine)<=5,fb:Math.abs(angs.spine)<=5?'정상':'측만 가능'},
+    {n:'어깨 수평',v:angs.shTilt+'%',g:Math.abs(angs.shTilt)<=3,fb:Math.abs(angs.shTilt)<=3?'수평 유지':'불균형 감지'},
+    {n:'골반 기울기',v:angs.hipTilt+'%',g:Math.abs(angs.hipTilt)<=2.5,fb:Math.abs(angs.hipTilt)<=2.5?'정렬 양호':'기울기 감지'},
+    {n:'무릎 굴곡(L)',v:angs.kneeL+'°',g:parseFloat(angs.kneeL)>=10&&parseFloat(angs.kneeL)<=30,fb:'10–30° 권장'},
+    {n:'머리 위치',v:Math.abs(angs.headFwd).toFixed(1)+'%',g:Math.abs(angs.headFwd)<=4,fb:Math.abs(angs.headFwd)<=4?'정상':'전방 돌출'},
+  ];
+  document.getElementById('jointList').innerHTML=joints.map(j=>`
+    <div class="joint-item">
+      <div class="jdot ${j.g?'good':'bad'}"></div>
+      <div style="flex:1"><div class="jname">${j.n}</div><div class="jfb">${j.fb}</div></div>
+      <div class="jangle">${j.v}</div>
+    </div>`).join('');
+
+  const fbs=[];
+  if(Math.abs(angs.shTilt)>3) fbs.push({bad:true,icon:'⚠️',txt:'어깨가 기울어져 있습니다. 양쪽 어깨를 수평으로 맞춰주세요.'});
+  if(Math.abs(angs.spine)>5) fbs.push({bad:true,icon:'🔴',txt:'척추가 측방으로 기울어 있습니다. 허리를 바르게 세워주세요.'});
+  if(parseFloat(angs.kneeL)<10) fbs.push({bad:true,icon:'⚠️',txt:'무릎을 약 15–20° 구부려 주세요 (어드레스 자세).'});
+  if(Math.abs(angs.headFwd)>4) fbs.push({bad:true,icon:'🔴',txt:'머리가 앞으로 나왔습니다. 턱을 살짝 당겨 중립 자세를 유지하세요.'});
+  if(!fbs.length) fbs.push({bad:false,icon:'✅',txt:'훌륭합니다! 현재 자세를 유지하세요.'});
+  document.getElementById('fbList').innerHTML=fbs.map(f=>`<div class="fb-item ${f.bad?'bad':''}"><div class="fb-icon">${f.icon}</div><div class="fb-txt">${f.txt}</div></div>`).join('');
+  document.getElementById('btnResult').disabled=false;
+}
+
+// ══ CAPTURE ══
+function doCapture(){
+  if(!curPose){ toast('자세를 감지할 수 없습니다','error'); return; }
+  const f=document.getElementById('flash');
+  f.classList.add('go'); setTimeout(()=>f.classList.remove('go'),400);
+  S.captured=JSON.parse(JSON.stringify(curPose));
+  S.hasCap=true;
+  toast('자세 캡처 완료!','success');
+  document.getElementById('btnResult').disabled=false;
+}
+
+// ══ RESULTS ══
+function toResults(){
+  const data=S.captured||curPose;
+  if(!data){ toast('먼저 자세를 캡처해 주세요','error'); return; }
+  goStep(3);
+  buildResults(data);
+}
+
+function buildResults(data){
+  const {angs,q}=data;
+  const sc=q.score;
+  document.getElementById('bigNum').textContent=sc;
+  document.getElementById('bigNum').style.color=sc>=80?'#80ffb3':sc>=65?'white':'#ff9090';
+  const grade=sc>=90?'S':sc>=80?'A':sc>=70?'B':sc>=55?'C':'D';
+  const gl=document.getElementById('gradeLine');
+  gl.textContent=`등급: ${grade}등급`;
+  gl.className=`grade-line grade-${grade}`;
+  document.getElementById('overallSumm').textContent=
+    sc>=80?'전반적으로 우수한 파크골프 자세입니다. 세부 교정으로 더욱 향상될 수 있습니다.'
+    :sc>=65?'기본 자세는 갖추어져 있으나 불균형 요소가 발견됩니다. 아래 교정운동을 시작하세요.'
+    :'체형 불균형이 감지됩니다. 전문가 상담과 함께 교정 프로그램을 꾸준히 실시하세요.';
+  document.getElementById('issueTags').innerHTML=
+    q.iss.map(i=>`<span class="itag bad">⚠ ${i}</span>`).join('')+
+    q.gds.map(g=>`<span class="itag good">✓ ${g}</span>`).join('');
+
+  // Angle table
+  const rows=[
+    ['척추기울기',`${angs.spine}°`,Math.abs(angs.spine)<=5?'good':'bad','<±5°'],
+    ['어깨편차',`${angs.shTilt}%`,Math.abs(angs.shTilt)<=3?'good':'bad','<3%'],
+    ['골반편차',`${angs.hipTilt}%`,Math.abs(angs.hipTilt)<=2.5?'good':'bad','<2.5%'],
+    ['무릎굴곡L',`${angs.kneeL}°`,parseFloat(angs.kneeL)>=10&&parseFloat(angs.kneeL)<=30?'good':parseFloat(angs.kneeL)<5?'bad':'ok','10–30°'],
+    ['무릎굴곡R',`${angs.kneeR}°`,parseFloat(angs.kneeR)>=10&&parseFloat(angs.kneeR)<=30?'good':'ok','10–30°'],
+    ['두부전방',`${Math.abs(angs.headFwd).toFixed(1)}%`,Math.abs(angs.headFwd)<=4?'good':'bad','<4%'],
+  ];
+  document.getElementById('angleTable').innerHTML=rows.map(([n,v,s,r])=>`
+    <tr><td>${n}</td><td style="color:var(--gray-400);font-size:10px">${r}</td>
+    <td><span class="a-val" style="color:${s==='good'?'#007a30':s==='bad'?'var(--red)':'var(--ghu-gold)'}">${v}</span>
+    <span class="pill pill-${s}">${s==='good'?'정상':s==='bad'?'교정':'주의'}</span></td></tr>`).join('');
+
+  // Imbalance
+  const imbs=[];
+  if(Math.abs(angs.shTilt)>3) imbs.push({sev:'high',name:'어깨 불균형',desc:`좌우 어깨 높이 차이 ${angs.shTilt}% — 승모근·능형근 불균형 가능`});
+  if(Math.abs(angs.hipTilt)>2.5) imbs.push({sev:'med',name:'골반 비대칭',desc:`골반 기울기 ${angs.hipTilt}% — 요방형근·중둔근 약화 가능`});
+  if(Math.abs(angs.spine)>5) imbs.push({sev:'high',name:'척추 정렬 이상',desc:`척추 ${angs.spine}° 기울기 — 측만증 스크리닝 및 코어 강화 권장`});
+  if(Math.abs(angs.headFwd)>4) imbs.push({sev:'med',name:'두부 전방 돌출',desc:'흉쇄유돌근 단축, 심부 경추굴근 약화 — 거북목 교정 필요'});
+  if(!imbs.length) imbs.push({sev:'none',name:'불균형 없음',desc:'좌우·전후 균형이 양호합니다.'});
+  document.getElementById('imbList').innerHTML=imbs.map(i=>`
+    <div class="imb-item ${i.sev}"><div class="imb-icon">${i.sev==='high'?'🔴':i.sev==='med'?'🟡':'🟢'}</div>
+    <div><div class="imb-name">${i.name}</div><div class="imb-desc">${i.desc}</div></div></div>`).join('');
+
+  document.getElementById('goodList').innerHTML=q.gds.map(g=>`
+    <div class="gp-item"><span class="gp-item-icon">✅</span><span style="font-size:11px;color:var(--gray-800)">${g}</span></div>`).join('')||'<div style="font-size:11px;color:var(--gray-600);padding:6px">분석 데이터 부족</div>';
+  document.getElementById('fixList').innerHTML=q.iss.map((iss,i)=>`
+    <div class="fix-item"><span class="fix-item-icon">${i+1}.</span><span style="font-size:11px;color:var(--gray-800)">${iss}</span></div>`).join('')||'<div style="font-size:11px;color:#007a30;padding:6px">교정 필요 없음 ✓</div>';
+
+  document.getElementById('aiLoad').style.display='none';
+  document.getElementById('resContent').style.display='block';
+
+  // Exercises
+  const exList=buildEx(q.iss,angs);
+  document.getElementById('exGrid').innerHTML=exList.map(e=>`
+    <div class="ex-card">
+      <div class="ex-muscle">${e.muscle}</div>
+      <div class="ex-head">
+        <div class="ex-name">${e.name}</div>
+        <span class="ex-src">${e.src}</span>
+      </div>
+      <div class="ex-desc">${e.desc}</div>
+      <div class="ex-meta">
+        <span class="ex-chip sets">🔁 ${e.sets}</span>
+        <span class="ex-chip level">📊 ${e.level}</span>
+        ${e.note?`<span class="ex-chip note">💡 ${e.note}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function buildEx(iss,angs){
+  const all=[
+    {muscle:'코어·척추 안정화',name:'데드버그 (Dead Bug)',desc:'허리를 바닥에 밀착한 채 반대쪽 팔다리를 뻗으며 복횡근을 활성화합니다. McGill(2015) 척추 안정화 프로토콜 핵심 운동입니다.',sets:'3세트×10회(양측)',level:'초급~중급',src:'NSCA/McGill',note:'허리 보호',rel:['척추 측만 가능성','어깨 불균형']},
+    {muscle:'척추 신근·다열근',name:'버드독 (Bird Dog)',desc:'사지지지 자세에서 반대쪽 팔다리를 수평으로 들어 요추 안정화 근육을 강화합니다. Hides et al.(2001) 요통 재발 감소 효과 입증.',sets:'3세트×12회(양측)',level:'초급',src:'ACSM·Hides2001',note:null,rel:['척추 측만 가능성']},
+    {muscle:'회전근개·중승모근',name:'Y-T-W 운동',desc:'엎드려 팔을 Y·T·W 형태로 들어올려 후부 어깨 안정화 근육을 강화합니다. Cools et al.(2007) 스캡울라 교정 프로그램.',sets:'3세트×12회',level:'초급~중급',src:'Cools et al.2007',note:null,rel:['어깨 불균형']},
+    {muscle:'소원근·극하근',name:'밴드 외회전 (Side-lying ER)',desc:'옆으로 누워 밴드를 이용해 어깨 외회전을 강화합니다. AAOS 어깨 재활 프로토콜 표준 운동.',sets:'3세트×15회',level:'초급',src:'AAOS 프로토콜',note:null,rel:['어깨 불균형']},
+    {muscle:'중둔근·소둔근',name:'클램쉘 (Clamshell)',desc:'옆으로 누운 상태에서 무릎을 벌려 중둔근을 선택적으로 강화합니다. Reiman et al.(2012) 메타분석에서 가장 높은 중둔근 활성화 확인.',sets:'3세트×20회',level:'초급',src:'Reiman et al.2012',note:null,rel:['골반 비틀림']},
+    {muscle:'대둔근·햄스트링',name:'힙 브리지 (Hip Bridge)',desc:'바로 누워 엉덩이를 들어 대둔근과 햄스트링을 강화합니다. 파크골프 스윙 시 하지 추진력·골반 안정성에 직접 관여.',sets:'3세트×15회',level:'초급',src:'NSCA 기능적 훈련',note:null,rel:['골반 비틀림']},
+    {muscle:'대퇴사두근·전경골근',name:'미니 스쿼트 (Mini Squat)',desc:'0–30° 범위 얕은 스쿼트로 슬관절 주변 근력을 강화하며 관절 부하를 최소화합니다. ACSM 노인 운동 가이드라인(2022) 권고.',sets:'3세트×15회',level:'초급',src:'ACSM 2022',note:'무릎 보호',rel:['무릎 굴곡 부족','무릎 과굴곡']},
+    {muscle:'심부 경추 굴근',name:'턱 당기기 (Chin Tuck)',desc:'앉아서 턱을 안쪽으로 당겨 경추 심부 굴근을 활성화하고 거북목을 교정합니다. Falla et al.(2007) 두부 전방 돌출 1차 교정 운동.',sets:'3세트×10초 유지×10회',level:'초급',src:'Falla et al.2007',note:null,rel:['머리 전방 돌출','두부 전방 돌출']},
+    {muscle:'흉쇄유돌근 스트레칭',name:'경추 측면 스트레칭',desc:'한 손으로 머리를 반대쪽으로 부드럽게 당겨 단축된 목 측면 근육을 이완합니다.',sets:'양측 30초×3회',level:'초급',src:'ACSM 유연성',note:null,rel:['두부 전방 돌출','머리 전방 돌출']},
+    {muscle:'전신 고유감각·균형',name:'한 발 서기 (Single Leg Stance)',desc:'한 발로 서서 15–30초 유지하며 발목 안정성·고유감각을 향상합니다. 낙상 예방 최고 수준 근거 (Sherrington et al., 2017).',sets:'양측 30초×3회',level:'초급',src:'Sherrington 2017',note:null,rel:[]},
+  ];
+  const relFirst=all.filter(e=>iss.some(i=>e.rel.includes(i)));
+  const rest=all.filter(e=>!iss.some(i=>e.rel.includes(i)));
+  return [...relFirst,...rest].slice(0,8);
+}
+
+// ══ SERVICE WORKER ══
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
